@@ -37,7 +37,7 @@ function lidar_configuration(){
       $3: symlink
 ###comment
 
-    rule='KERNEL=="ttyUSB*", ATTRS{idVendor}="='$1'", ATTRS{idProduct}=="'$2'", MODE:="0666", GROUP:="dialout",  SYMLINK+="'$3'"' 
+    rule='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$1'", ATTRS{idProduct}=="'$2'", MODE:="0666", GROUP:="dialout",  SYMLINK+="'$3'"' 
     echo $rule | sudo tee --append /etc/udev/rules.d/$3.rules
     sudo udevadm control --reload-rules
     sudo udevadm trigger
