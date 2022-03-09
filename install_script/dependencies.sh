@@ -46,6 +46,6 @@ function lidar_configuration(){
 }
 
 # Install
-#apt_dependencies
-#ros_dependencies $ROS_DISTRO
+apt_dependencies
+ros_dependencies $ROS_DISTRO
 lidar_configuration "10c4" "ea60" "rplidar_laser"
