@@ -1,0 +1,13 @@
+1.如果使用自建Ubuntu系统环境：
+  按照【3.ROS开发手册/1.Ubuntu配置教程.pdf】教程配置环境，复制与本文档在同一级目录下的文件夹【src】到ROS工作空间下，在工作空间下编译即可。
+
+2.如果使用我们提供的系统镜像，切换适配不同车型只需要3步：
+  ①替换文件夹【srtc】下的文件夹【turn_on_wheeltec_robot】。
+     注意，jetson nano的【kcf_track】功能包需要替换，nano版的【kcf_track】功能包在与本文档在同一级目录下的文件夹【kcf_track\nano\kcf_track】。
+  ②替换后在文件夹【turn_on_wheeltec_robot】下打开终端，运行命令【find ./* -exec touch {} \;】递归修改文件夹文件修改时间。
+  ③在工作空间打开终端，运行命令【catkin_make -DCATKIN_WHITELIST_PACKAGES="turn_on_wheeltec_robot"】编译指定功能包。
+     注意：这个指令只编译一个功能包，编译速度快很多，但是之后会一直只编译这个包，直到发以下指令：
+  catkin_make -DCATKIN_WHITELIST_PACKAGES=""
+
+(零基础建议学习相关ROS课程了解工作空间概念后操作)
+有错误请先移步【常见问题与BUG解决教程.docx】
