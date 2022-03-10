@@ -29,17 +29,22 @@ function ros_dependencies(){
                      ros-$1-ecl-core
 }
 
-function lidar_configuration(){
+function uart_configuration(){
 <<"###comment"
     Function: add udev rules for lidar
     Args: 
-      $1: idVendor
-      $2: idProduct
-      $3: symlink
+      $1: lidar idVendor
+      $2: lidar idProduct
+      $3: lidar symlink
+      $4: STM32 idVendor
+      $5: STM32 idProduct
+      $6: STM32 symlink
 ###comment
 
-    rule='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$1'", ATTRS{idProduct}=="'$2'", MODE:="0666", GROUP:="dialout",  SYMLINK+="'$3'"' 
-    echo $rule | sudo tee --append /etc/udev/rules.d/$3.rules
+    rule1='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$1'", ATTRS{idProduct}=="'$2'",ATTRS{serial}=="0002" ,MODE:="0666", GROUP:="dialout",  SYMLINK+="'$3'"'
+    rule2='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$4'", ATTRS{idProduct}=="'$5'",ATTRS{serial}=="0001" ,MODE:="0666", GROUP:="dialout",  SYMLINK+="'$6'"'  
+    echo $rule1 | sudo tee --append /etc/udev/rules.d/wheeltec.rules
+    echo $rule2 | sudo tee --append /etc/udev/rules.d/wheeltec.rules
     sudo udevadm control --reload-rules
     sudo udevadm trigger
 
@@ -62,5 +67,13 @@ function setup_nfs(){
 # Install
 #apt_dependencies
 #ros_dependencies $ROS_DISTRO
-#lidar_configuration "10c4" "ea60" "rplidar_laser"
-setup_nfs
+
+lidar_idVendor="10c4"
+lidar_idProduct="ea60"
+lidar_symlink="rplidar_laser"
+STM32_idVendor=$lidar_idVendor
+STM32_idProduct=$lidar_idProduct
+STM32_symlink="wheeltec_controller"
+
+uart_configuration $lidar_idVendor $lidar_idProduct $lidar_symlink $STM32_idVendor $STM32_idProduct $STM32_symlink
+#setup_nfs
