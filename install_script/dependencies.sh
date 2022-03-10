@@ -25,7 +25,8 @@ function ros_dependencies(){
                      ros-$1-teb-local-planner \
                      ros-$1-async-web-server-cpp \
                      ros-$1-joy \
-                     ros-$1-ackermann-msgs
+                     ros-$1-ackermann-msgs \
+                     ros-$1-ecl-core
 }
 
 function lidar_configuration(){
@@ -45,7 +46,21 @@ function lidar_configuration(){
 
 }
 
+function setup_nfs(){
+<<"###comment"
+	Function: setup NFS server
+###comment
+    #sudo apt install nfs-kernel-server
+	project=$HOME'/'$(pwd | cut -d / -f 4)
+	echo $project' *(rw,sync,no_root_squash)' | sudo tee --append /etc/exports 
+	sudo chmod -R 777 $project
+	#sudo chown -R 777 nobody $project
+	sudo /etc/init.d/nfs-kernel-server start
+	sudo /etc/init.d/nfs-kernel-server restart
+}
+
 # Install
-apt_dependencies
-ros_dependencies $ROS_DISTRO
-lidar_configuration "10c4" "ea60" "rplidar_laser"
+#apt_dependencies
+#ros_dependencies $ROS_DISTRO
+#lidar_configuration "10c4" "ea60" "rplidar_laser"
+setup_nfs
