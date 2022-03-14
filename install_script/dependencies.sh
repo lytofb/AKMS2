@@ -27,7 +27,8 @@ function ros_dependencies(){
                      ros-$1-joy \
                      ros-$1-ackermann-msgs \
                      ros-$1-ecl-core \
-                     ros-$1-teleop-twist-keyboard
+                     ros-$1-teleop-twist-keyboard \
+                     ros-$1-gmapping
 }
 
 function uart_configuration(){
