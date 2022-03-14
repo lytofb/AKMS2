@@ -1,4 +1,4 @@
-image: /home/robot/AKMS2/catkin_ws/src/wheeltec_robot_rc/map/test_20220314.pgm
+image: /home/robot/AKMS2/catkin_ws/src/turn_on_wheeltec_robot/map/test_20220314.pgm
 resolution: 0.050000
 origin: [-13.800000, -12.200000, 0.000000]
 negate: 0

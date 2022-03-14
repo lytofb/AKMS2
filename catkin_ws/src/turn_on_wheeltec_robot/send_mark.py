@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 
 from visualization_msgs.msg import Marker
@@ -18,8 +18,8 @@ def pose_callback(msg):
         #count表示当前目标点计数，index表示已完成的目标点计数
         if index == count:                   #当index等于count时，表示所有目标点完成，重新开始巡航
             print ('Reach the target point '+str(index-1)+'.')
-            if count>1: print 'Complete instructions!' #只有一个目标点不算巡航
-            index = 0;
+            if count>1: print("Complete instructions!") #只有一个目标点不算巡航
+            index = 0
             pose = PoseStamped()
             pose.header.frame_id = 'map'
             pose.header.stamp = rospy.Time.now()
