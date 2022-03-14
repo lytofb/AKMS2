@@ -49,3 +49,6 @@ catkin_ws//planning/src
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# VS Code
+.vscode/*
