@@ -26,7 +26,8 @@ function ros_dependencies(){
                      ros-$1-async-web-server-cpp \
                      ros-$1-joy \
                      ros-$1-ackermann-msgs \
-                     ros-$1-ecl-core
+                     ros-$1-ecl-core \
+                     ros-$1-teleop-twist-keyboard
 }
 
 function uart_configuration(){
