@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+	<!-- Args -->
+	<arg name="map_name" doc="Please type the map name you want, and it will store in /home/wheeltec/wheeltec_robot/src/turn_on_wheeltec_robot/map"/>
+	
+	
+	<!-- Node map_server -->
+	<node pkg="map_server" type="map_saver" name="map_saver" args="-f /home/wheeltec/wheeltec_robot/src/turn_on_wheeltec_robot/map/$(arg map_name)" output="screen">	
+	</node>
+	
+</launch>
