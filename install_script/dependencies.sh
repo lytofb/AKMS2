@@ -10,6 +10,16 @@ sudo apt install terminator \
                  liborocos-bfl-dev
 }
 
+function python3_dependencies(){
+<<"###comment"
+    Function: Install application through pip3
+###comment
+pip3 install -U scikit-learn
+
+
+}
+
+
 function ros_dependencies(){
 <<"###comment"
     Function: Install ROS dependencies.
@@ -67,8 +77,9 @@ function setup_nfs(){
 }
 
 # Install
-#apt_dependencies
-#ros_dependencies $ROS_DISTRO
+apt_dependencies
+ros_dependencies $ROS_DISTRO
+python3_dependencies
 
 lidar_idVendor="10c4"
 lidar_idProduct="ea60"
