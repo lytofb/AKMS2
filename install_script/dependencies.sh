@@ -7,7 +7,8 @@ function apt_dependencies(){
 sudo apt install terminator \
                  byobu \
                  libuvc-dev \
-                 liborocos-bfl-dev
+                 liborocos-bfl-dev \
+                 v4l-utils
 }
 
 function python3_dependencies(){
@@ -38,7 +39,11 @@ function ros_dependencies(){
                      ros-$1-ackermann-msgs \
                      ros-$1-ecl-core \
                      ros-$1-teleop-twist-keyboard \
-                     ros-$1-gmapping
+                     ros-$1-gmapping \
+                     ros-$1-rgbd-launch \
+                     ros-$1-libuvc \
+                     ros-$1-libuvc-camera \
+                     ros-$1-libuvc-ros
 }
 
 function uart_configuration(){
@@ -57,6 +62,8 @@ function uart_configuration(){
     rule2='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$4'", ATTRS{idProduct}=="'$5'",ATTRS{serial}=="0001" ,MODE:="0666", GROUP:="dialout",  SYMLINK+="'$6'"'  
     echo $rule1 | sudo tee --append /etc/udev/rules.d/wheeltec.rules
     echo $rule2 | sudo tee --append /etc/udev/rules.d/wheeltec.rules
+    sudo cp ~/AKMS2/catkin_ws/src/ros_astra_camera/56-orbbec-usb.rules /etc/udev/rules.d/astra_camera.rules
+
     sudo udevadm control --reload-rules
     sudo udevadm trigger
 
