@@ -8,7 +8,9 @@ sudo apt install terminator \
                  byobu \
                  libuvc-dev \
                  liborocos-bfl-dev \
-                 v4l-utils
+                 v4l-utils \
+                 dkms \
+                 hwinfo
 }
 
 function python3_dependencies(){
