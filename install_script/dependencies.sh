@@ -41,7 +41,6 @@ function ros_dependencies(){
                      ros-$1-teleop-twist-keyboard \
                      ros-$1-gmapping \
                      ros-$1-rgbd-launch \
-                     ros-$1-libuvc \
                      ros-$1-libuvc-camera \
                      ros-$1-libuvc-ros
 }
