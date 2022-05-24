@@ -69,11 +69,6 @@
   </group>
 
   <!-- move_base -->
-  <include file="$(find turn_on_wheeltec_robot)/launch/include/tel_local_planner.launch">
-
-  </include>
-
-  <!-- move_base -->
   <!--include file="$(find turtlebot3_navigation)/launch/move_base.launch"-->
     <!--arg name="model" value="$(arg model)" /-->
     <!--arg name="move_forward_only" value="$(arg move_forward_only)"/-->
@@ -81,11 +76,11 @@
        
   <!-- rviz -->
   <!--group if="$(arg open_rviz)"--> 
-    <!--node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/-->
+  <!--node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/-->
 
-    <!-- MarkerArray多点导航功能节点> -->
-    <node name='send_mark' pkg="turn_on_wheeltec_robot" type="send_mark.py">
-    </node>
+  <!-- MarkerArray多点导航功能节点> -->
+  <node name='send_mark' pkg="turn_on_wheeltec_robot" type="send_mark.py">
+  </node>
 
   <!--/group-->
 </launch>

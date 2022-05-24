@@ -41,11 +41,11 @@
   <param name="namespace" value=""/>
   <param name="delay_after_assignement" value="0.5"/>
   <param name="rate" value="100"/>
-  <param name="plan_service" value="/move_base_node/GlobalPlanner/make_plan"/>
+  <param name="plan_service" value="/move_base/GlobalPlanner/make_plan"/><!-- DWA算法需要关闭这一行 -->
   </node>
 
   <node pkg="rrt_exploration" type="wait_for_fin" name="wait_for_fin" output="screen">
-  <param name="waiting_time" value="50"/>
+  <param name="waiting_time" value="20"/>
 
   </node>
 

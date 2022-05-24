@@ -22,7 +22,6 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <ackermann_msgs/AckermannDriveStamped.h>
 #include <sensor_msgs/Imu.h>
 using namespace std;
 
@@ -141,12 +140,9 @@ class turn_on_robot
 		float Sampling_Time;         //Sampling time, used for integration to find displacement (mileage) //采样时间，用于积分求位移(里程)
 
 		ros::Subscriber Cmd_Vel_Sub; //Initialize the topic subscriber //初始化话题订阅者
-		//Ackerman speed topic subscribe callback function, type Ackerman trolleys use this function declaration
-		//阿克曼速度话题订阅回调函数，类型阿克曼小车使用此函数声明
-		void Cmd_Vel_Callback(const ackermann_msgs::AckermannDriveStamped &akm_ctl); 
-		//The speed topic subscribes to the callback function, which is used by other cars to declare
-		//速度话题订阅回调函数，其它小车使用此函数声明
-		//void Cmd_Vel_Callback(const geometry_msgs::Twist &twist_aux);              
+		//The speed topic subscribes to the callback function
+		//速度话题订阅回调函数
+		void Cmd_Vel_Callback(const geometry_msgs::Twist &twist_aux);              
 
 		ros::Publisher odom_publisher, imu_publisher, voltage_publisher; //Initialize the topic publisher //初始化话题发布者
 		void Publish_Odom();      //Pub the speedometer topic //发布里程计话题
@@ -156,11 +152,12 @@ class turn_on_robot
         //从串口(ttyUSB)读取运动底盘速度、IMU、电源电压数据
         //Read motion chassis speed, IMU, power supply voltage data from serial port (ttyUSB)
         bool Get_Sensor_Data();   
+		bool Get_Sensor_Data_New();
         unsigned char Check_Sum(unsigned char Count_Number,unsigned char mode); //BBC check function //BBC校验函数
         short IMU_Trans(uint8_t Data_High,uint8_t Data_Low);  //IMU data conversion read //IMU数据转化读取
 		float Odom_Trans(uint8_t Data_High,uint8_t Data_Low); //Odometer data is converted to read //里程计数据转化读取
 
-        string usart_port_name, robot_frame_id, gyro_frame_id, odom_frame_id, smoother_cmd_vel; //Define the related variables //定义相关变量
+        string usart_port_name, robot_frame_id, gyro_frame_id, odom_frame_id; //Define the related variables //定义相关变量
         int serial_baud_rate;      //Serial communication baud rate //串口通信波特率
         RECEIVE_DATA Receive_Data; //The serial port receives the data structure //串口接收数据结构体
         SEND_DATA Send_Data;       //The serial port sends the data structure //串口发送数据结构体

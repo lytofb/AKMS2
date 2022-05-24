@@ -1,10 +1,13 @@
 <launch> 
     <!-- 摄像头限制，障碍物与摄像头距离小于0.6m时无法识别障碍物 -->
 
-    <!-- 开启机器人底层相关节点  -->
-    <include file="$(find turn_on_wheeltec_robot)/launch/turn_on_wheeltec_robot.launch" />
+    <!-- 开启机器人底层相关节点 同时开启导航功能 -->
+    <include file="$(find turn_on_wheeltec_robot)/launch/turn_on_wheeltec_robot.launch" >
+        <arg name="pure3d_nav"  default="true"/>
+        <arg name="odom_frame_id"   value="odom"/>
+    </include>
     <!-- 开启摄像头 -->
-    <include file="$(find astra_camera)/launch/astrapro.launch" />
+    <include file="$(find astra_camera)/launch/astra.launch" />
 
     <!-- 自定义scan数据tf位置 -->
     <node pkg="tf" type="static_transform_publisher" name="base_to_depth2laser1" args="0.34 0.00 0.5 0 0 0  base_footprint laser1 100" />
@@ -88,11 +91,9 @@
       </node>
     </group>
      
-    <!-- 开启tel_local_planner导航算法-一般用于全向移动阿克曼等车-->
-    <include file="$(find turn_on_wheeltec_robot)/launch/include/tel_local_planner_pure3d.launch" />
 
     <!-- 固定odom_combined于map，连接tf树 -->
-  <node pkg="tf" type="static_transform_publisher" name="odom_to_map" args="0 0 0 0 0 0  map odom_combined 100" />
+    <node pkg="tf" type="static_transform_publisher" name="odom_to_map" args="0 0 0 0 0 0  map odom_combined 100" />
 
     <!-- MarkerArray功能节点> -->
     <node name='send_mark' pkg="turn_on_wheeltec_robot" type="send_mark.py">

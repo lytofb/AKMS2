@@ -1,13 +1,37 @@
-global_costmap:
-   global_frame: map #参数定义了代价地图应该运行的坐标系，在这种情况下，我们将选择/map坐标系。对于全局代价地图，我们用map框架来作为global框架。
-   robot_base_frame: base_footprint #参数定义了代价地图应该为机器人的基座的坐标系。这个通常不是base_link就是base_footprint。对于我们的机器人应设为base_footprint。
-   update_frequency: 1.5 #参数决定了代价地图更新的频率（以Hz为单位）。根据传感器数据，全局地图更新的频率，这个数值越大，你的计算机的CPU负担会越重，特别对于全局地图，通常设定一个相对较小、在1.0到5.0之间的值。
-   publish_frequency: 1.0 #参数决定代价地图发布可视化信息的速率（以Hz为单位）。
-   #static_map: true #参数确定是否由map_server提供的地图服务来进行代价地图的初始化。如果您没有使用现有的地图或地图服务器，请将static_map参数设置为false。当本地地图需要根据传感器数据动态更新的时候，我们通常会把这个参数设为false。
-   transform_tolerance: 1
-   plugins:
-     - {name: static_layer,            type: "costmap_2d::StaticLayer"}
-     - {name: obstacle_layer,          type: "costmap_2d::VoxelLayer"}
-     - {name: inflation_layer,         type: "costmap_2d::InflationLayer"}
+#代价地图官方介绍：http://wiki.ros.org/costmap_2d
 
-    
+#全局代价地图参数命名空间
+global_costmap:
+  #代价地图的TF参考坐标系
+  global_frame: map 
+  #机器人的TF坐标名称
+  robot_base_frame: base_footprint
+  #global_frame和robot_base_frame间的TF坐标停止发布多久后，控制机器人停止，单位：s
+  transform_tolerance: 1
+  #代价地图刷新频率，单位：Hz
+  update_frequency: 1.5
+  #代价地图的可视化话题发布频率，单位：Hz
+  publish_frequency: 1.0
+
+  #是否直接使用静态地图生成代价地图
+  #static_map: true #使用plugins手动配置代价地图时，该参数无效
+  #代价地图是否跟随机器人移动，static_map为true时该参数必须为false
+  rolling_window: false
+  #代价地图宽度，这里会被静态层扩宽，单位：m
+  width: 10.0 
+  #代价地图高度，这里会被静态层扩宽，单位：m
+  height: 10.0 
+  #代价地图分辨率（米/单元格）
+  resolution: 0.05
+  
+  #为代价地图设置地图层，这里设置了三层，分别作为静态层、障碍层和膨胀层
+  plugins:
+    #定义地图层的名称，设置地图层的类型
+    - {name: static_layer,      type: "costmap_2d::StaticLayer"}
+    #定义地图层的名称，设置地图层的类型。
+    #障碍层可以使用VoxelLayer代替ObstacleLayer
+    - {name: obstacle_layer,    type: "costmap_2d::VoxelLayer"}
+    #定义地图层的名称，设置地图层的类型
+    - {name: inflation_layer,   type: "costmap_2d::InflationLayer"}
+  #各地图层的参数，会以地图层名称作为命名空间
+  #各地图层的参数，会在【costmap_common_params.yaml】内进行设置
