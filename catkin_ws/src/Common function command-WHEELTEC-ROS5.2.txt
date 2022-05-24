@@ -2,7 +2,7 @@
 //need to launch the initialization node first
 roslaunch turn_on_wheeltec_robot turn_on_wheeltec_robot.launch
 //launch the keyboard control node 
-roslaunch joy_control joy_control.launch
+roslaunch wheeltec_joy_control joy_control.launch
 
 2.line-tracking with radar obstacle avoidance (sensor: radar, camera)
 roslaunch simple_follower line_follower.launch 
