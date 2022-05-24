@@ -1,5 +1,5 @@
 <launch>
-    <arg name="rplidar_mode"  default="ld_14" 
+    <arg name="rplidar_mode"  default="rplidar_A1_A2" 
     doc="opt: ls_M10, ls_N10, ld_14, rplidar_A1_A2, rplidar_A3, rplidar_S1 "/>
 
 

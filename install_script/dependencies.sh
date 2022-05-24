@@ -41,7 +41,7 @@ function ros_dependencies(){
                      ros-$1-ackermann-msgs \
                      ros-$1-ecl-core \
                      ros-$1-teleop-twist-keyboard \
-                     ros-$1-gmapping \
+                     ros-$1-slam-gmapping \
                      ros-$1-rgbd-launch \
                      ros-$1-libuvc-camera \
                      ros-$1-libuvc-ros
@@ -91,7 +91,7 @@ python3_dependencies
 
 lidar_idVendor="10c4"
 lidar_idProduct="ea60"
-lidar_symlink="rplidar_laser"
+lidar_symlink="wheeltec_lidar"
 STM32_idVendor=$lidar_idVendor
 STM32_idProduct=$lidar_idProduct
 STM32_symlink="wheeltec_controller"
