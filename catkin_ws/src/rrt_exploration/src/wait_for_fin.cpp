@@ -8,8 +8,16 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PointStamped.h>
+#include <std_msgs/String.h>
+#include <stdio.h>
 
+ros::Publisher rrt_flag_pub; // 自主建图开启标志位发布者
+ros::Publisher overmap_flag_pub; //建图完成标志位发布者
 
+std::string rrt_flag = "rrt_flag";
+
+int overmap_flag =0;
+int rrt_success = 0;
 int count = 0 ;
 int if_start = 0;
 
@@ -47,6 +55,9 @@ int main(int argc, char** argv)
 
 	ros::Subscriber start_sub = nha.subscribe("/clicked_point",1,start_Callback);
 
+	rrt_flag_pub = nha.advertise<std_msgs::Int8>("rrt_flag", 1);
+
+	overmap_flag_pub = nha.advertise<std_msgs::Int8>("overmap_flag", 1);
 	int waiting_time ;
 	ros::param::param<int>("/wait_for_fin/waiting_time", waiting_time, 60);
 
@@ -76,11 +87,24 @@ int main(int argc, char** argv)
 		if(count == (waiting_time+5))
 		{
 			back_pub.publish(origin);
+			std_msgs::Int8 overmap_flag_msg;
+			overmap_flag_msg.data = 1;
+			overmap_flag_pub.publish(overmap_flag_msg);//建图完成标志位发布
+			printf("a=%d",overmap_flag_msg.data);
 			break;
 		}
 
 		printf("count=%d\n",count);
 		// printf("if_start=%d\n",if_start);
+		if(rrt_success == 0)
+		{
+		std_msgs::Int8 rrt_flag_msg;
+		rrt_flag_msg.data = 1;
+		sleep(2);
+		rrt_flag_pub.publish(rrt_flag_msg);//自主建图开启成功标志位发布
+		printf("a=%d",rrt_flag_msg.data);
+		rrt_success = 1;
+		}
 		ros::spinOnce();
 		loopRate.sleep();      
 	}
