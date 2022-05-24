@@ -37,6 +37,9 @@
 #include "std_srvs/Empty.h"
 #include "sl_lidar.h" 
 
+#include <dynamic_reconfigure/server.h>
+#include <rplidar_ros/paramsConfig.h>
+
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
@@ -46,6 +49,74 @@
 using namespace sl;
 
 ILidarDriver * drv = NULL;
+
+double angle_start, angle_end, distance_min, distance_max,angle_cur,
+       angle1_start,angle1_end,angle2_start,angle2_end,angle3_start,angle3_end,angle4_start,angle4_end;
+bool is_parted;
+
+//交换函数
+template<class T>
+void swap(T &a,T &b){
+    T temp = a;
+    a = b;
+    b = temp;
+}
+
+//判断角度          起始角度         结束角度        当前角度   
+bool jdg_ang(double angle_s,double angle_e,double angle_c){
+    if (angle_s<=angle_e){
+        return angle_c>=angle_s&&angle_c<angle_e;
+    }
+    else{
+        return angle_c>=angle_s||angle_c<=angle_e;
+    }
+}
+
+// dynamic_reconfigure 回调函数
+void reconfigCB(rplidar_ros::paramsConfig &config,uint32_t level)
+{
+    angle_start = config.angle_start;
+    angle_end = config.angle_end;
+    // 当最小扫描半径大于最大扫描半径时，将二者值互换
+    if(config.distance_max < config.distance_min)
+    {   
+        swap<double>(config.distance_min,config.distance_max);
+    }
+    
+    distance_max = config.distance_max;
+    distance_min = config.distance_min;
+
+    // 是否分割雷达扫描角度
+    is_parted = config.is_parted;
+
+    // 第一个屏蔽角度
+    angle1_start = config.angle1_start;
+    angle1_end = config.angle1_end;
+
+    // 第二个屏蔽角度
+    angle2_start = config.angle2_start;
+    angle2_end = config.angle2_end;
+
+    // 第三个屏蔽角度
+    angle3_start = config.angle3_start;
+    angle3_end = config.angle3_end;
+
+    // 第四个屏蔽角度
+    angle4_start = config.angle4_start;
+    angle4_end = config.angle4_end;
+
+    ROS_INFO("min_distance:%lf,max_distance:%lf",distance_min,distance_max);
+
+    if (is_parted){
+        ROS_INFO("\nangle1_start:%lf,angle1_end:%lf\nangle2_start:%lf,angle2_end:%lf\nangle3_start:%lf,angle3_end:%lf\nangle4_start:%lf,angle4_end:%lf",angle1_start,angle1_end,angle2_start,angle2_end,angle3_start,angle3_end,angle4_start,angle4_end);
+    }
+    else{
+        ROS_INFO("angle_start:%lf,angle_end:%lf",angle_start,angle_end);   
+    } 
+
+}
+
+
 
 void publish_scan(ros::Publisher *pub,
                   sl_lidar_response_measurement_node_hq_t *nodes,
@@ -81,7 +152,7 @@ void publish_scan(ros::Publisher *pub,
     scan_msg.intensities.resize(node_count);
     scan_msg.ranges.resize(node_count);
     bool reverse_data = (!inverted && reversed) || (inverted && !reversed);
-    if (!reverse_data) {
+    /*if (!reverse_data) {
         for (size_t i = 0; i < node_count; i++) {
             float read_value = (float) nodes[i].dist_mm_q2/4.0f/1000;
             if (read_value == 0.0)
@@ -99,8 +170,97 @@ void publish_scan(ros::Publisher *pub,
                 scan_msg.ranges[node_count-1-i] = read_value;
             scan_msg.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
         }
-    }
+    }*/
+//是否分割角度
 
+    //不分割角度
+    if (!is_parted){
+        if (!reverse_data) {
+            for (size_t i = 0; i < node_count; i++) {
+                float read_value = (float) nodes[i].dist_mm_q2/4.0f/1000;
+                 //angle_cur为当前扫描角度
+                angle_cur = i*360/node_count;
+                if(angle_end>=angle_start)
+                  {
+                    if(angle_cur>angle_end || angle_cur<angle_start)read_value=0;
+                  }
+                else
+                  {
+                    if(angle_cur>angle_end && angle_cur<angle_start)read_value=0;
+                  }
+                // if (read_value == 0.0)
+                if (read_value <= distance_min || read_value >= distance_max)
+                    scan_msg.ranges[i] = std::numeric_limits<float>::infinity();  // 如果不在角度不在扫描范围内，将该角度对应的目标距离置为无穷大
+                else
+                    scan_msg.ranges[i] = read_value;
+                scan_msg.intensities[i] = (float) (nodes[i].quality >> 2);
+            }
+        } else {
+            for (size_t i = 0; i < node_count; i++) {
+                float read_value = (float)nodes[i].dist_mm_q2/4.0f/1000;
+                //angle_cur为当前扫描角度
+                angle_cur = i*360/node_count;                
+                if(angle_end>=angle_start)
+                  {
+                    if(angle_cur>angle_end || angle_cur<angle_start)read_value=0;
+                  }
+                else
+                  {
+                    if(angle_cur>angle_end && angle_cur<angle_start)read_value=0;
+                  }
+                //if (read_value == 0.0)
+                if (read_value <= distance_min || read_value >= distance_max)
+                    scan_msg.ranges[node_count-1-i] = std::numeric_limits<float>::infinity();
+                else
+                    scan_msg.ranges[node_count-1-i] = read_value;
+                scan_msg.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
+            }
+        }
+    }
+    //分割角度
+    else{
+        if (!reverse_data) {
+            for (size_t i = 0; i < node_count; i++) {
+                float read_value = (float) nodes[i].dist_mm_q2/4.0f/1000;
+                //angle_cur为当前扫描角度
+                angle_cur = i*360/node_count;
+                if (jdg_ang(angle1_start,angle1_end,angle_cur)||
+                    jdg_ang(angle2_start,angle2_end,angle_cur)||
+                    jdg_ang(angle3_start,angle3_end,angle_cur)||
+                    jdg_ang(angle4_start,angle4_end,angle_cur))
+                {
+                    read_value=0;
+                }
+
+                // if (read_value == 0.0)
+                if (read_value <= distance_min || read_value >= distance_max)
+                    scan_msg.ranges[i] = std::numeric_limits<float>::infinity();  // 如果不在角度不在扫描范围内，将该角度对应的目标距离置为无穷大
+                else
+                    scan_msg.ranges[i] = read_value;
+                scan_msg.intensities[i] = (float) (nodes[i].quality >> 2);
+            }
+        } else {
+            for (size_t i = 0; i < node_count; i++) {
+                float read_value = (float)nodes[i].dist_mm_q2/4.0f/1000;
+                //angle_cur为当前扫描角度
+                angle_cur = i*360/node_count;
+                if (jdg_ang(angle1_start,angle1_end,angle_cur)||
+                    jdg_ang(angle2_start,angle2_end,angle_cur)||
+                    jdg_ang(angle3_start,angle3_end,angle_cur)||
+                    jdg_ang(angle4_start,angle4_end,angle_cur))
+                {
+                    read_value=0;
+                }
+
+                //if (read_value == 0.0)
+                if (read_value <= distance_min || read_value >= distance_max)
+                    scan_msg.ranges[node_count-1-i] = std::numeric_limits<float>::infinity();
+                else
+                    scan_msg.ranges[node_count-1-i] = read_value;
+                scan_msg.intensities[node_count-1-i] = (float) (nodes[i].quality >> 2);
+            }
+        }
+    }
     pub->publish(scan_msg);
 }
 
@@ -202,6 +362,7 @@ int main(int argc, char * argv[]) {
     bool angle_compensate = true;    
     float angle_compensate_multiple = 1.0;//min 360 ponits at per 1 degree
     int points_per_circle = 360;//min 360 ponits at per circle 
+
     std::string scan_mode;
     float max_distance;
     float scan_frequency;
@@ -219,6 +380,35 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("inverted", inverted, false);
     nh_private.param<bool>("angle_compensate", angle_compensate, false);
     nh_private.param<std::string>("scan_mode", scan_mode, std::string());
+
+    nh_private.param<double>("angle_start", angle_start, 0);
+    nh_private.param<double>("angle_end", angle_end, 360);
+    nh_private.param<double>("distance_min", distance_min, 0);
+    nh_private.param<double>("distance_max", distance_max, 30);
+    nh_private.param<bool>("is_parted",is_parted,false);
+
+        //第一个屏蔽角度
+    nh_private.param<double>("angle1_start",angle1_start,40);
+    nh_private.param<double>("angle1_end",angle1_end,50);
+
+    //第二个屏蔽角度
+    nh_private.param<double>("angle2_start",angle2_start,130);
+    nh_private.param<double>("angle2_end",angle2_end,140);
+
+    //第三个屏蔽角度
+    nh_private.param<double>("angle3_start",angle3_start,130);
+    nh_private.param<double>("angle3_end",angle3_end,140);
+    
+    //第四个屏蔽角度
+    nh_private.param<double>("angle4_start",angle4_start,130);
+    nh_private.param<double>("angle4_end",angle4_end,140);
+
+    // Dynamic Reconfigure
+    dynamic_reconfigure::Server<rplidar_ros::paramsConfig> dynamic_reconfigure_server;
+    dynamic_reconfigure::Server<rplidar_ros::paramsConfig>::CallbackType dynamic_reconfigure_callback;
+    dynamic_reconfigure_callback = boost::bind(&reconfigCB,_1, _2);
+    
+    dynamic_reconfigure_server.setCallback(dynamic_reconfigure_callback);
     if(channel_type == "udp"){
         nh_private.param<float>("scan_frequency", scan_frequency, 20.0);
     }
