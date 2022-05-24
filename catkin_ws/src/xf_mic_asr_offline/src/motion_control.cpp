@@ -20,10 +20,10 @@
 #include <move_base_msgs/MoveBaseActionResult.h>
 //#include <move_base_msgs/MoveBaseAction.h>
 
+
 using namespace std;
  
 ros::Publisher cmd_vel_Pub;    //创建底盘速度控制话题发布者
-
 geometry_msgs::Twist cmd_vel_msg;    //速度控制信息数据
 ros::Publisher akm_navigation_pub;
 //ros::Publisher goal_reach_pub;
@@ -33,6 +33,8 @@ float dis_angleX;    //障碍物方向
 int angle = 0;    //当前唤醒角度
 int follow_flag = 0;    //寻找声源标志位
 int cmd_vel_flag = 0;    //底盘控制器标志位
+int goal_control=0;
+int overmap_flag =0;
 
 float radar_range ;
 int radar_count ;
@@ -40,7 +42,15 @@ double direction;
 
 string reach = "" ;
 
+void gaol_Callback(std_msgs::Int8 msg)
+{
+	goal_control = msg.data;
+}
 
+void overmap_Callback(std_msgs::Int8 msg)
+{
+	overmap_flag = msg.data;
+}
 /**************************************************************************
 函数功能：sub回调函数
 入口参数：  laserTracker.py
@@ -137,6 +147,17 @@ void pose_Callback(const geometry_msgs::PoseWithCovarianceStamped& msg)
 void goal_reach_Callback(const move_base_msgs::MoveBaseActionResult& msg)
 {
 	reach = msg.status.text;
+	if(reach == "Goal reached." && goal_control==1)//I、J、K点到达播报
+	{
+		system("aplay -D plughw:CARD=Device,DEV=0 ~/wheeltec_robot/src/xf_mic_asr_offline/feedback_voice/reach_goal.wav");
+		goal_control=0;
+	}
+	else if(reach == "Goal reached." && overmap_flag==1)//建图完成播报
+	{
+		system("aplay -D plughw:CARD=Device,DEV=0 ~/wheeltec_robot/src/xf_mic_asr_offline/feedback_voice/overmap.wav");
+		overmap_flag=0;
+	}
+
 }
 /**************************************************************************
 函数功能：寻找声源控制转向部分
@@ -312,6 +333,12 @@ int main(int argc, char** argv)
 	/***创建底盘速度控制话题发布者***/
 	cmd_vel_Pub = node.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 
+	/***创建当I、J、K点到达标志位话题订阅者***/
+	ros::Subscriber goal_sub = node.subscribe("goal_control_flag", 1, gaol_Callback);//
+
+	/***创建建图完成标志位话题订阅者***/
+	ros::Subscriber overmap_sub = node.subscribe("overmap_flag", 1, overmap_Callback);
+
 	/***创建当前唤醒角度话题订阅者***/
 	ros::Subscriber angle_sub = node.subscribe("current_angle", 1, angle_Callback);
 
@@ -406,13 +433,23 @@ int main(int argc, char** argv)
 						std_msgs::String count_msg;
 						count_msg.data = str1;
 						control1.publish(count_msg);
+						cmd_vel_msg.angular.z = 0;
+						cmd_vel_msg.linear.x = 0;    //速度置零
+						cmd_vel_Pub.publish(geometry_msgs::Twist());
+						cmd_vel_flag = 0;    //各标志位置零
+						turn_fin_flag = 0;
+						temp_count = 0;
 					}
+					else
+					{
 					cmd_vel_msg.angular.z = 0;
 					cmd_vel_msg.linear.x = 0;    //速度置零
 					cmd_vel_Pub.publish(geometry_msgs::Twist());
 					cmd_vel_flag = 0;    //各标志位置零
 					turn_fin_flag = 0;
 					temp_count = 0;
+					system("aplay -D plughw:CARD=Device,DEV=0 ~/wheeltec_robot/src/xf_mic_asr_offline/feedback_voice/find.wav");
+					}
 				}
 			}
 			else temp_count = 0;    //排除雷达噪点

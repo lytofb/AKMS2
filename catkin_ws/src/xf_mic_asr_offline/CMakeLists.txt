@@ -22,7 +22,6 @@ link_directories(
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -216,7 +215,6 @@ target_link_libraries(
  )
 
 
-
 add_executable(motion_control
   src/motion_control.cpp 
 )
@@ -246,16 +244,44 @@ target_link_libraries(
  )
 
 
+add_executable(point_navigation
+  src/point_navigation.cpp 
+)
+add_dependencies(
+  point_navigation
+  ${xf_mic_package_EXPORTED_TARGETS}
+  xf_mic_asr_offline_gencpp
+)
+target_link_libraries(
+   point_navigation
+   ${catkin_LIBRARIES} 
+ )
 
-#add_executable(test
-#  src/test.cpp 
-#)
+add_executable(node_close_feedback
+  src/node_close_feedback.cpp 
+)
+add_dependencies(
+  node_close_feedback
+  ${xf_mic_package_EXPORTED_TARGETS}
+  xf_mic_asr_offline_gencpp
+)
+target_link_libraries(
+   node_close_feedback
+   ${catkin_LIBRARIES} 
+ )
 
-#target_link_libraries(
-#   test
-#   ${catkin_LIBRARIES} 
-# )
-
+ add_executable(node_opne_feedback
+  src/node_opne_feedback.cpp 
+)
+add_dependencies(
+  node_opne_feedback
+  ${xf_mic_package_EXPORTED_TARGETS}
+  xf_mic_asr_offline_gencpp
+)
+target_link_libraries(
+   node_opne_feedback
+   ${catkin_LIBRARIES} 
+ )
 #############
 ## Install ##
 #############

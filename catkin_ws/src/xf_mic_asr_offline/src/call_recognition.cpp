@@ -23,7 +23,7 @@ using namespace std;
 int awake_flag = 0;    //唤醒标志位
 int confidence_threshold ;
 int seconds_per_order ;
-
+int recognize_fail_count = 0;  //被动休眠相关变量
 /**************************************************************************
 函数功能：唤醒标志sub回调函数
 入口参数：唤醒标志位awake_flag_msg  voice_control.cpp
@@ -33,6 +33,8 @@ void awake_flag_Callback(std_msgs::Int8 msg)
 {
 	awake_flag = msg.data;
 	printf("awake_flag=%d\n",awake_flag);
+	recognize_fail_count = 0;
+
 	
 }
 
@@ -45,7 +47,7 @@ void awake_flag_Callback(std_msgs::Int8 msg)
 int main(int argc, char *argv[])
 {
 	//int temp=0;
-	int recognize_fail_count = 0;    //被动休眠相关变量
+	   
 	int recognize_fail_count_threshold = 15;    //识别失败次数阈值
 	
 	string str1 = "ok";				//语音识别相关字符串
@@ -72,7 +74,7 @@ int main(int argc, char *argv[])
 	ros::Publisher awake_flag_pub = nh.advertise<std_msgs::Int8>("awake_flag", 1);
 
 	/***离线命令词识别结果话题发布者创建***/
-	ros::Publisher control = nh.advertise<std_msgs::String>("voice_words", 10);
+	ros::Publisher control = nh.advertise<std_msgs::String>("voice_words", 1);
 
 	ros::Rate loop_rate(10);    //循环频率10Hz
 
@@ -98,21 +100,26 @@ int main(int argc, char *argv[])
 	{
 		if(awake_flag)    //判断休眠状态还是唤醒状态
 		{
+
 			if(get_offline_recognise_result_client.call(GetOfflineResult_srv))    //请求离线命令词识别服务并返回应答为调用成功
 			{
-				ROS_INFO("succeed to call service \"get_offline_recognise_result_srv\"!");    //打印识别结果、置信度、识别命令词等信息
+				//ROS_INFO("succeed to call service \"get_offline_recognise_result_srv\"!");    //打印识别结果、置信度、识别命令词等信息
 				std::cout << "result: " << GetOfflineResult_srv.response.result << endl;
 				std::cout << "fail reason: " << GetOfflineResult_srv.response.fail_reason << endl;
 				std::cout << "text: " << GetOfflineResult_srv.response.text << endl;
 
 				if(str3 == GetOfflineResult_srv.response.text)    //主动休眠
+				{ 
 					awake_flag=0;
+					recognize_fail_count = 0;
+					
+				}
 				else if(str1 == GetOfflineResult_srv.response.result)    //清零被动休眠相关变量
 					recognize_fail_count = 0;
 				else if(str2 == GetOfflineResult_srv.response.result)    //记录识别失败次数
 				{
 					recognize_fail_count++;
-					printf("recognize_fail_count=%d\n",recognize_fail_count);
+					//printf("recognize_fail_count=%d\n",recognize_fail_count);
 					if(recognize_fail_count==5)    //连续识别失败5次，用户界面显示提醒信息
 					{
 						std_msgs::String count_msg;
@@ -126,7 +133,15 @@ int main(int argc, char *argv[])
 						count_msg.data = str5;
 						control.publish(count_msg);
 						
-						
+					}
+					else if(recognize_fail_count >= recognize_fail_count_threshold)    //被动休眠
+					{
+						awake_flag=0;
+						std_msgs::String controloff_msg;
+						controloff_msg.data = str3;
+						control.publish(controloff_msg);
+						recognize_fail_count = 0;
+					
 					}
 				}
 			}
@@ -134,21 +149,7 @@ int main(int argc, char *argv[])
 			{
 				ROS_INFO("failed to call service \"get_offline_recognise_result_srv\"!");
 				//awake_flag=0;
-				break;
-			}
-
-			if(recognize_fail_count >= recognize_fail_count_threshold)    //被动休眠
-			{
-				awake_flag=0;
-				std_msgs::String controloff_msg;
-				controloff_msg.data = str3;
-				control.publish(controloff_msg);
-				recognize_fail_count = 0;
-
-        std_msgs::Int8 awake_flag_msg;
-        awake_flag_msg.data = 0;
-        awake_flag_pub.publish(awake_flag_msg);
-			
+				continue;
 			}
 			
 		}		

@@ -24,9 +24,10 @@
 #include <std_msgs/Int32.h>
 #include <sys/stat.h>
 
- 
+
 ros::Publisher voice_words_pub;
 ros::Publisher awake_flag_pub;
+ros::Publisher voice_flag_pub;
 
 ros::Publisher pub_pcm;
 ros::Publisher pub_awake_angle;
@@ -41,6 +42,8 @@ std::string pcm_topic = "/mic/pcm/deno";
 std::string major_mic_topic = "/mic/major_mic";
 
 std::string voice_words = "voice_words";
+
+std::string voice_flag = "voice_flag";
 
 std::string awake_flag = "awake_flag";
 
@@ -894,9 +897,11 @@ int main(int argc, char *argv[])
 	major_mic_pub = ndHandle.advertise<std_msgs::Int8>(major_mic_topic, 1);
 
 
-	voice_words_pub = n.advertise<std_msgs::String>(voice_words, 10);
+	voice_words_pub = n.advertise<std_msgs::String>(voice_words, 1);
 
 	awake_flag_pub = n.advertise<std_msgs::Int8>(awake_flag, 1);
+
+	voice_flag_pub = n.advertise<std_msgs::Int8>(voice_flag, 1);
 
 
 	/*srv　接收请求，开启录音或关闭录音*/
@@ -960,9 +965,17 @@ int main(int argc, char *argv[])
 		}
 	}
 	printf(">>>>>开机成功！\n");
-	set_awake_word(awake_words);
+	sleep(3);
+        set_awake_word(awake_words);
 	
+	if(1)
+	{
+		std_msgs::Int8 voice_flag_msg;
+	voice_flag_msg.data = 1;
+	voice_flag_pub.publish(voice_flag_msg);
+	}
 	
+
 	ros::AsyncSpinner spinner(3);
 	spinner.start();
 	if (major_mic_id>5 || major_mic_id<0)

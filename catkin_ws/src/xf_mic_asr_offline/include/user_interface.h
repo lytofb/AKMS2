@@ -34,6 +34,7 @@ char *APPID = (char*)" ";
 //运行效果调试参数
 int confidence;
 int time_per_order;//一次命令时长默认时长,如用户在接口中不进行设置,则默认为该值
-char awake_words[30] = "你好小微";
+
+char awake_words[30] = "你好小微";//"hello jack";//"你好小微";
 
 

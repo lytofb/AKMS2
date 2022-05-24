@@ -24,6 +24,7 @@ ros::ServiceClient Set_Major_Mic_client;    //定义设置主麦服务的客户端
 ros::Publisher current_angle_pub;    //定义当前小车的相对唤醒角度
 
 
+
 /**************************************************************************
 函数功能：唤醒角度sub回调函数
 入口参数：唤醒角度值awake_angle  voice_control.cpp
