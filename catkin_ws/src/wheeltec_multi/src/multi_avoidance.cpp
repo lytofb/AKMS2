@@ -56,9 +56,9 @@ void cmd_vel_ori_Callback(const geometry_msgs::Twist& msg)
 int distance_judgment(void)
 {
 	//int a;
-	if(distance1<=0.65) 
+	if(distance1<=0.4) 
 	{
-		ROS_INFO("distance1 less then 0.65 ");
+		ROS_INFO("distance1 less then 0.4 ");
 		printf("distance1= %f\n",distance1);
 
 		return 1;
