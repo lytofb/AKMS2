@@ -15,10 +15,10 @@ class Follower:
         self.bridge = cv_bridge.CvBridge()
         cv2.namedWindow("window", cv2.WINDOW_NORMAL)
         # 订阅usb摄像头
-        self.image_sub = rospy.Subscriber("/usb_cam/image_raw", Image, self.image_callback)
+        # self.image_sub = rospy.Subscriber("/usb_cam/image_raw", Image, self.image_callback)
         # self.image_sub = rospy.Subscriber("cv_bridge_image", Image, self.image_callback)
         # 订阅深度相机
-        # self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_callback)
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_callback)
         # self.image_sub = rospy.Subscriber("/camera/depth/image_raw", Image,self.image_callback)
         self.cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
         self.twist = Twist()

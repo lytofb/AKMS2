@@ -11,8 +11,8 @@ def nothing(s):
     pass
 col_black = (0,0,0,180,255,46)# black
 col_red = (0,100,80,10,255,255)# red
-col_blue = (100,43,46,124,255,255)# blue
-col_green= (35,43,46,77,255,255)# green
+col_blue = (90,90,90,110,255,255)# blue
+col_green= (65,70,70,85,255,255)# green
 col_yellow = (26,43,46,34,255,255)# yellow
 
 cv2.namedWindow('Adjust_hsv',cv2.WINDOW_NORMAL)
@@ -24,10 +24,10 @@ class Follower:
         self.bridge = cv_bridge.CvBridge()
         #cv2.namedWindow("window", 1)
         # 订阅usb摄像头
-        self.image_sub = rospy.Subscriber("/usb_cam/image_raw", Image, self.image_callback)
+        # self.image_sub = rospy.Subscriber("/usb_cam/image_raw", Image, self.image_callback)
         # self.image_sub = rospy.Subscriber("cv_bridge_image", Image, self.image_callback)
         # 订阅深度相机
-        # self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_callback)
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_raw", Image, self.image_callback)
         # self.image_sub = rospy.Subscriber("/camera/depth/image_raw", Image,self.image_callback)
         self.cmd_vel_pub = rospy.Publisher("cmd_vel_ori", Twist, queue_size=1)
         self.twist = Twist()
@@ -107,11 +107,11 @@ class Follower:
             #cv2.circle(image, (w/2, h), 10, (0, 255, 255), -1)
             if cv2.circle:
             # 计算图像中心线和目标指示线中心的距离
-                erro = cx - w/2-60
+                erro = cx - w/2-15
                 d_erro=erro-last_erro
-                self.twist.linear.x = 0.2
+                self.twist.linear.x = 0.18
                 if erro!=0:
-                    self.twist.angular.z = -float(erro)*0.003-float(d_erro)*0.008 
+                    self.twist.angular.z = -float(erro)*0.005-float(d_erro)*0.000
                 else :
                     self.twist.angular.z = 0
                 last_erro=erro

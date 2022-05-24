@@ -160,7 +160,7 @@ int main(int argc, char** argv)
 
 	ros::Subscriber vel_sub = node.subscribe("/odom", 1, vel_Callback);
 
-	ros::Subscriber acc_sub = node.subscribe("/mobile_base/sensors/imu_data", 1, acc_Callback);
+	ros::Subscriber acc_sub = node.subscribe("imu", 1, acc_Callback);
 
 
 	

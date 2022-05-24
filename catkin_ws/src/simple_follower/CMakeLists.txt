@@ -11,6 +11,14 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   geometry_msgs
   message_generation
+  dynamic_reconfigure
+)
+
+generate_dynamic_reconfigure_options(
+  cfg/arPID.cfg
+  cfg/laser_params.cfg
+  cfg/Params_color.cfg
+  cfg/Params_PID.cfg
 )
 
 ## System dependencies are found with CMake's conventions

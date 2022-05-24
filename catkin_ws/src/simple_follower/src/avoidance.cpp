@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 	ros::Subscriber current_position_sub = node.subscribe("/object_tracker/current_position", 1, current_position_Callback);
 
 	
-	double rate2 = 10;    //频率10Hz
+	double rate2 = 30;    //频率30Hz
 	ros::Rate loopRate2(rate2);
 
  
