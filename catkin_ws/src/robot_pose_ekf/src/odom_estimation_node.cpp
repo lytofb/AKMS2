@@ -73,7 +73,6 @@ namespace estimation
   {
     ros::NodeHandle nh_private("~");
     ros::NodeHandle nh;
-
     // paramters
     nh_private.param("output_frame", output_frame_, std::string("odom_combined"));
     nh_private.param("base_footprint_frame", base_footprint_frame_, std::string("base_footprint"));
