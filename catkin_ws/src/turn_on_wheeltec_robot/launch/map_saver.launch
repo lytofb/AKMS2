@@ -2,11 +2,10 @@
 
 <launch>
 	<!-- Args -->
-	<arg name="map_name" doc="Please type the map name you want, and it will store in /home/wheeltec/wheeltec_robot/src/turn_on_wheeltec_robot/map"/>
-	
+	<arg name="map_name" doc="Please type the map name you want, and it will store in /home/ros/AKMS2/catkin_ws/src/turn_on_wheeltec_robot/map$(arg map_name)"/>
 	
 	<!-- Node map_server -->
-	<node pkg="map_server" type="map_saver" name="map_saver" args="-f /home/wheeltec/wheeltec_robot/src/turn_on_wheeltec_robot/map/$(arg map_name)" output="screen">	
+	<node pkg="map_server" type="map_saver" name="map_saver" args="-f /home/ros/AKMS2/catkin_ws/src/turn_on_wheeltec_robot/map/$(arg map_name)" output="screen">	
 	</node>
 	
 </launch>
