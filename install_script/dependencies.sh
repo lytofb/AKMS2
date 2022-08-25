@@ -59,6 +59,8 @@ function uart_configuration(){
       $6: STM32 symlink
 ###comment
 
+    # /bin/udevadm info --name=/dev/ttyUSB0 | grep SERIAL_SHORT -> Search Serial Number to distinguish devices of smae PD and ID.
+    # rule1='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$1'", ATTRS{idProduct}=="'$2'",ATTRS{serial}=="Serial Number" ,MODE:="0666", GROUP:="dialout",  SYMLINK+="Symlink Name"'
     rule1='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$1'", ATTRS{idProduct}=="'$2'",ATTRS{serial}=="0002" ,MODE:="0666", GROUP:="dialout",  SYMLINK+="'$3'"'
     rule2='KERNEL=="ttyUSB*", ATTRS{idVendor}=="'$4'", ATTRS{idProduct}=="'$5'",ATTRS{serial}=="0001" ,MODE:="0666", GROUP:="dialout",  SYMLINK+="'$6'"'  
     echo $rule1 | sudo tee --append /etc/udev/rules.d/wheeltec.rules
